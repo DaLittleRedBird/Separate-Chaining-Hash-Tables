@@ -1,3 +1,4 @@
+//"Standard" C static library header file
 #ifndef SEPERATE_CHAIN_HASH
 #define SEPERATE_CHAIN_HASH
 
@@ -20,7 +21,7 @@ int rehash() { //RNG
     return state;
 }
 
-struct HASH_TABLE* newHashTable(int Initsize) {
+struct HASH_TABLE* newHashTable(unsigned int Initsize) {
     struct HASH_TABLE* table = {0, 8, rehash(), rehash(), {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}};
     if (/*Initsize != NULL && */Initsize > 8) {
         table.size = Initsize;
@@ -62,7 +63,7 @@ struct HASH_TABLE* rebuild(struct HASH_TABLE* oldtable) {
             }
         }
     }
-    return table;
+    return newtable;
 }
 
 void insert(struct HASH_TABLE* table, struct STRING_STRING_NODE* node, char* key, char* value) {
