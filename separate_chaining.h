@@ -22,8 +22,17 @@ struct STRING_STRING_NODE_VECTOR create_vector(unsigned int initial_capacity) {
     newVect->size = 0;
     newVect->capacity = initial_capacity;
     newVect->data = malloc(newVect->capacity * sizeof(void*));
-    if (newVect->data == NULL) { exit(4); }
+    if (newVect->data == NULL) { exit(1); }
     return newVect;
+}
+
+void resize_vector(STRING_STRING_NODE_VECTOR* vector) {
+    STRING_STRING_NODE** items = (STRING_STRING_NODE**)realloc(vector->data, vector->capacity * 2 * sizeof(int));
+    if (items) {
+        vector->data = items;
+        vector->capacity *= 2;
+    }
+    exit(1);
 }
 
 STRING_STRING_NODE* vector_get(STRING_STRING_NODE_VECTOR* vec, int index) {
@@ -87,7 +96,7 @@ int gethash(struct HASH_TABLE* table, char* key) {
 
 struct HASH_TABLE rebuild(struct HASH_TABLE* oldtable) {
     unsigned int chainLens[oldtable->capacity] = (unsigned int[oldtable->capacity])malloc(sizeof(unsigned int) * oldtable->capacity);
-    struct HASH_TABLE newtable = {0, oldtable->capacity, rehash(), rehash(), create_vector(oldtable->capacity)};
+    struct HASH_TABLE newtable = {0, oldtable->capacity, rehash(), rehash(), create_vector(oldtable->capacity * 2)};
     for (int curChain = 0; curChain < newtable.capacity; curChain++) { chainLens[curChain] = 0; }
     
     while (newtable.setSize < oldTable->setSize) {
