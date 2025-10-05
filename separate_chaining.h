@@ -22,8 +22,8 @@ int rehash() { //RNG
 }
 
 struct HASH_TABLE* newHashTable(unsigned int Initsize) {
-    struct HASH_TABLE* table = {0, 8, rehash(), rehash(), {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}};
-    if (/*Initsize != NULL && */Initsize > 8) {
+    struct HASH_TABLE* table = {0, 16, rehash(), rehash(), {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}};
+    if (/*Initsize != NULL && */Initsize > 16) {
         table.size = Initsize;
         table->array = (struct STRING_STRING_NODE**)malloc(sizeof(struct STRING_STRING_NODE*) * table->capacity);
     }
@@ -40,7 +40,7 @@ int gethash(struct HASH_TABLE* table, char* key) {
 }
 
 struct HASH_TABLE* rebuild(struct HASH_TABLE* oldtable) {
-    struct HASH_TABLE* newtable = {0, oldtable.capacity, rehash(), rehash(), {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}};
+    struct HASH_TABLE* newtable = {0, 16, rehash(), rehash(), {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}};
     unsigned int chainLens[newtable.capacity] = (unsigned int[newtable.capacity])malloc(sizeof(unsigned int) * newtable->capacity);
     table->array = (struct STRING_STRING_NODE**)malloc(sizeof(struct STRING_STRING_NODE*) * newtable->capacity);
     for (int curChain = 0; curChain < newtable.capacity; curChain++) { chainLens[curChain] = 0; }
@@ -54,7 +54,7 @@ struct HASH_TABLE* rebuild(struct HASH_TABLE* oldtable) {
         //I'm not going to let the new table have a chain of size >= (table.capacity / 2).
         for (int curLen = 0; curLen < newtable.capacity; curLen++) {
             if (chainLen >= (newtable.capacity / 2)) {
-                newtable = {0, oldtable.capacity, rehash(), rehash(), rehash(), {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}};
+                newtable = {0, 16, rehash(), rehash(), {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}};
                 table->array = (struct STRING_STRING_NODE**)malloc(sizeof(struct STRING_STRING_NODE*) * newtable->capacity);
                 for (int curChain = 0; curChain < newtable.capacity; curChain++) { chainLens[curChain] = 0; }
                 break;
