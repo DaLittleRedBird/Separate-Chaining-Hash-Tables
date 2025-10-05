@@ -36,6 +36,7 @@ int gethash(struct HASH_TABLE* table, char* key) {
         hash = hash * table.coeff1 + table.coeff2 * key[i];
         while(state >= 0xFFFFFFFF) { state += (state >> 32); }
     }
+    hash %= table.capacity;
     return hash;
 }
 
