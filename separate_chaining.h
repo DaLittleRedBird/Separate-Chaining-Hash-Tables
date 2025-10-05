@@ -9,7 +9,7 @@ struct STRING_STRING_NODE {
 }
 
 struct HASH_TABLE {
-    int setSize, capacity;
+    unsigned int setSize, capacity;
     int coeff1, coeff2; //2^31 - 1 == 2147483647 is a well-known merssenne prime
     struct STRING_STRING_NODE** array;
 }
@@ -25,7 +25,7 @@ struct HASH_TABLE* newHashTable(unsigned int Initsize) {
     struct HASH_TABLE* table = {0, 8, rehash(), rehash(), {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}};
     if (/*Initsize != NULL && */Initsize > 8) {
         table.size = Initsize;
-        for (int curList = 0; curList < Initsize; curList++) { table->array[curList] = NULL; }
+        table->array = (struct STRING_STRING_NODE**)malloc(sizeof(struct STRING_STRING_NODE*) * table->capacity);
     }
     return table;
 }
@@ -41,23 +41,21 @@ int gethash(struct HASH_TABLE* table, char* key) {
 
 struct HASH_TABLE* rebuild(struct HASH_TABLE* oldtable) {
     struct HASH_TABLE* newtable = {0, oldtable.capacity, rehash(), rehash(), {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}};
-    int[newtable.capacity] chainLens = {0, 0, 0, 0, 0, 0, 0, 0};
-    for (int curList = 0; curList < newtable.capacity; curList++) { newtable->array[curList] = NULL; }
+    unsigned int chainLens[newtable.capacity] = (unsigned int[newtable.capacity])malloc(sizeof(unsigned int) * newtable->capacity);
+    table->array = (struct STRING_STRING_NODE**)malloc(sizeof(struct STRING_STRING_NODE*) * newtable->capacity);
     for (int curChain = 0; curChain < newtable.capacity; curChain++) { chainLens[curChain] = 0; }
     
     while (newtable.setSize < oldTable.setSize) {
         int bucketIndex = gethash(newtable, key);
         struct STRING_STRING_NODE* newNode = {key, value, NULL};
-        if (newtable->array[bucketIndex] != NULL) {
-            newNode->next = newtable->array[bucketIndex];
-        }
+        if (newtable->array[bucketIndex] != NULL) { newNode->next = newtable->array[bucketIndex]; }
         newtable->array[bucketIndex] = newNode;
 
         //I'm not going to let the new table have a chain of size >= (table.capacity / 2).
         for (int curLen = 0; curLen < newtable.capacity; curLen++) {
             if (chainLen >= (newtable.capacity / 2)) {
                 newtable = {0, oldtable.capacity, rehash(), rehash(), rehash(), {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}};
-                for (int curList = 0; curList < newtable.capacity; curList++) { newtable->array[curList] = NULL; }
+                table->array = (struct STRING_STRING_NODE**)malloc(sizeof(struct STRING_STRING_NODE*) * newtable->capacity);
                 for (int curChain = 0; curChain < newtable.capacity; curChain++) { chainLens[curChain] = 0; }
                 break;
             }
