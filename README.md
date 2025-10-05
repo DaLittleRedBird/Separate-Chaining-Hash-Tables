@@ -1,0 +1,1 @@
+  I've been researching perfect hash tables lately and I've come to realize that in order to pull such hash tables off I must use seperately chained hash tables or Cuckoo hashing, so I'm going to implement seperate chaining in as many languages as I can starting with C and Javascript.
