@@ -60,18 +60,18 @@ struct HASH_TABLE {
     struct STRING_STRING_NODE_VECTOR array;
 }
 
-int rehash() { //RNG
-    static long state = 0x6a09e667; //First 32 bits of sqrt(2); state should be random and NOT a multiple of 2147483647 == 0xFFFFFFFF.
-    state *= 0xbb67ae85; //First 32 bits of sqrt(3)
-    while(state >= 0xFFFFFFFF) { state += (state >> 32); }
-    return state;
-}
-
 struct HASH_TABLE newHashTable(unsigned int Initsize) {
     struct STRING_STRING_NODE_VECTOR newarray;
     unsigned int _Initial_Capacity = Initsize > 16 ? Initsize : 16;
     struct HASH_TABLE* table = {0, _Initial_Capacity, rehash(), rehash(), create_vector(_Initial_Capacity)};
     return table;
+}
+
+int rehash() { //RNG
+    static long state = 0x6a09e667; //First 32 bits of sqrt(2); state should be random and NOT a multiple of 2147483647 == 0xFFFFFFFF.
+    state *= 0xbb67ae85; //First 32 bits of sqrt(3)
+    while(state >= 0xFFFFFFFF) { state += (state >> 32); }
+    return state;
 }
 
 void freeHashTable(struct HASH_TABLE* table) {
@@ -95,22 +95,28 @@ int gethash(struct HASH_TABLE* table, char* key) {
 }
 
 struct HASH_TABLE rebuild(struct HASH_TABLE* oldtable) {
-    unsigned int chainLens[oldtable->capacity] = (unsigned int[oldtable->capacity])malloc(sizeof(unsigned int) * oldtable->capacity);
-    struct HASH_TABLE newtable = {0, oldtable->capacity * 2, rehash(), rehash(), create_vector(oldtable->capacity * 2)};
+    unsigned int chainLens[oldtable->capacity * 2] = (unsigned int[oldtable->capacity])malloc(sizeof(unsigned int) * oldtable->capacity);
+    struct HASH_TABLE newtable = {0, oldtable->capacity * 2, rehash(), rehash(), create_vector(oldtable->setSize * 2)};
     for (int curChain = 0; curChain < newtable.capacity; curChain++) { chainLens[curChain] = 0; }
     
-    while (newtable.setSize < oldTable->setSize) {
+    while (newtable.setSize < oldtable->setSize) {
         int bucketIndex = gethash(newtable, key);
         struct STRING_STRING_NODE newNode = {key, value, NULL};
         
         struct STRING_STRING_NODE top_node = vector_get(newtable.array, bucketIndex);
         if (top_node != NULL) { newNode.next = top_node; }
         vector_set(newtable.array, bucketIndex, newNode);
+        newtable.setSize++;
+        chainLens[bucketIndex]++;
 
-        //I'm not going to let the new table have a chain of size >= (table.capacity / 2).
+        //I'm not going to let the new table have a chain of size >= (oldtable.capacity / 2).
         for (int curLen = 0; curLen < newtable.capacity; curLen++) {
-            if (chainLen >= (newtable.capacity / 2)) {
+            unsigned int chainLen = chainLens[curLen];
+            if (chainLen >= (oldtable->capacity / 2)) {
                 vector_free(newtable.array);
+                newtable.setSize = 0;
+                newtable.coeff1 = rehash();
+                newtable.coeff2 = rehash();
                 newtable.array = create_vector(newtable.capacity);
                 for (int curChain = 0; curChain < newtable.capacity; curChain++) { chainLens[curChain] = 0; }
                 break;
@@ -128,6 +134,7 @@ void insert(struct HASH_TABLE* table, struct STRING_STRING_NODE* node, char* key
     struct STRING_STRING_NODE top_node = vector_get(table->array, bucketIndex);
     if (top_node != NULL) { newNode.next = top_node; }
     vector_set(table->array, bucketIndex, newNode);
+    table->setSize++;
 
     int chainLen = 0;
     struct STRING_STRING_NODE* currNode = table->array[bucketIndex];
@@ -153,6 +160,7 @@ void delete(struct HASH_TABLE* table, char* key) {
             if (currNode == vector_get(table->array, bucketIndex)) {
                 vector_set(table->array, bucketIndex, currNode->next);
             } else { prevNode->next = currNode->next; }
+            table->setSize--;
             break;
         }
         prevNode = currNode;
