@@ -33,7 +33,7 @@ struct HASH_TABLE* newHashTable(unsigned int Initsize) {
 int gethash(struct HASH_TABLE* table, char* key) {
     int hash = 0;
     for (int i = 0; key[i] != '\0'; i++) { //C strings are null terminated, so we should iterate unitl we hit '\0'.
-        hash = (hash * table.coeff1) + table.coeff2;
+        hash = hash * table.coeff1 + table.coeff2 * key[i];
         while(state >= 0xFFFFFFFF) { state += (state >> 32); }
     }
     return hash;
